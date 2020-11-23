@@ -25,7 +25,7 @@ const KEY_F = 70 // 102
 const KEY_UP = 38
 const KEY_DOWN = 40
 
-GRAVITY = 6.67e-11 * 3e9 // Scale up by a billion or so just to help things out
+GRAVITY = 6.67e-11 * 3e10 // Scale up by 10 billion or so just to help things out
 
 // Colours
 const BACKGROUND_COLOUR = 'rgb(237, 137, 17)'
@@ -249,5 +249,4 @@ $(function() {
   }
 
   two.bind('update', step).play();
-
 });
