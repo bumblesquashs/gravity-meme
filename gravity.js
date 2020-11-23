@@ -22,6 +22,9 @@ const KEY_Q = 81 // 113
 const KEY_R = 82 // 114
 const KEY_F = 70 // 102
 
+const KEY_UP = 38
+const KEY_DOWN = 40
+
 GRAVITY = 6.67e-11 * 3e9 // Scale up by a billion or so just to help things out
 
 // Colours
@@ -37,6 +40,7 @@ let points = []
 let numRemaining = NUM_POINTS
 let timeElapsed = 0
 let timeElapsedMs = 0
+let gravityMulitplier = 1
 
 // Runs after page loads
 $(function() {
@@ -133,9 +137,11 @@ $(function() {
   points.push({id: 0, shape: player, pos: startingPoint, vel: new Two.Vector(0,0), mass: getMass(PLAYER_RADIUS)})
 
   const styles = {fill: PLAYER_COLOUR, size: 15, alignment: 'left'}
-  const infoText = two.makeText("Use WASD to control. F to brake. R to reset.", 20, 10, styles);
+  const infoText = two.makeText("Use WASD to control. F to brake. R to reset. Up and down arrows change gravity strength.", 20, 10, styles);
   const timeText = two.makeText("Time Elapsed: 0:00", 20, 30, styles);
   const remainingText = two.makeText("Points left: " + NUM_POINTS, 20, 50, styles);
+  const gravityText = two.makeText(`Gravity multiplier: ${gravityMulitplier}x`, 20, 70, styles);
+
 
   // Draw points first time
   drawPoints();
@@ -163,6 +169,14 @@ $(function() {
         points[0].vel = new Two.Vector(0, 0)
         points[0].pos = new Two.Vector(two.width/2, two.height/2)
       }
+      if(e.keyCode == KEY_UP){
+        gravityMulitplier *= 10
+        gravityText.value = `Gravity multiplier: ${gravityMulitplier}x`
+      }
+      if(e.keyCode == KEY_DOWN){
+        gravityMulitplier /= 10
+        gravityText.value = `Gravity multiplier: ${gravityMulitplier}x`
+      }
   });
 
   function isOffscreen(point) {
@@ -180,7 +194,6 @@ $(function() {
       }
       // Set points as dead if they are offscreen and not us
       if(isOffscreen(us) && us.id !== 0){
-        console.log('got here')
         us.dead = 1
         numRemaining -= 1
       }
@@ -196,7 +209,7 @@ $(function() {
         const ourPos = us.pos.clone()
         const r = theirPos.subtract(ourPos) // vector subtraction
         const distance = r.length() // magnitude
-        const forceMagnitude = (GRAVITY * us.mass * them.mass) / (distance**2)
+        const forceMagnitude = (GRAVITY * gravityMulitplier * us.mass * them.mass) / (distance**2)
         r.normalize()
         const force = r.multiplyScalar(forceMagnitude);
         netForce.add(force) // add the scaled new force vector to the current force
